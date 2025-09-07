@@ -1,0 +1,45 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Reprodutibilidade
+np.random.seed(42)
+
+# Criar dados fictícios
+n = 200
+dados = {
+    "Data": pd.date_range(start="2024-01-01", periods=n, freq="D"),
+    "Produto": np.random.choice(["Notebook", "Celular", "Tablet", "Monitor"], size=n),
+    "Quantidade": np.random.randint(1, 10, size=n),
+    "Preco_Unitario": np.random.choice([1500, 3000, 5000, 800], size=n)
+}
+
+df = pd.DataFrame(dados)
+df["Receita"] = df["Quantidade"] * df["Preco_Unitario"]
+
+df.head()
+
+
+print(df.describe())
+print(df["Produto"].value_counts())
+
+receita_produto = df.groupby("Produto")["Receita"].sum().sort_values(ascending=False)
+print(receita_produto)
+
+sns.barplot(x=receita_produto.index, y=receita_produto.values)
+plt.title("Receita por Produto")
+plt.ylabel("Receita Total (R$)")
+plt.show()
+
+df_diario = df.groupby("Data")["Receita"].sum()
+
+plt.figure(figsize=(12, 5))
+df_diario.plot()
+plt.title("Receita ao longo do tempo")
+plt.ylabel("Receita diária (R$)")
+plt.xlabel("Data")
+plt.show()
+
+top5 = df.groupby("Data")["Receita"].sum().sort_values(ascending=False).head(5)
+print(top5)
